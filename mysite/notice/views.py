@@ -3,8 +3,7 @@
 from django.views.generic import ListView
 from .models import Notice
 from django.shortcuts import get_object_or_404, render
-from django.contrib.auth.decorators import login_required
-
+from users.decorators import login_message_required
 
 class NoticeListView(ListView):
     model = Notice
@@ -36,7 +35,7 @@ class NoticeListView(ListView):
         return context
 
 
-@login_required
+@login_message_required
 def notice_detail_view(request, pk):
     notice = get_object_or_404(Notice, pk=pk)
     context = {
