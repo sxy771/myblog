@@ -5,6 +5,7 @@ from .models import Notice
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import login_required
 
+
 class NoticeListView(ListView):
     model = Notice
     paginate_by = 10

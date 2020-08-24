@@ -22,4 +22,5 @@ urlpatterns = [
     path('', blogapp.views.index, name='index'),
     path('blog/', include('blogapp.urls')),
     path('notice/', include('notice.urls')),
+    path('users/', include('users.urls')),
 ]

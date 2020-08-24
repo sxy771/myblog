@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'blogapp.apps.BlogappConfig',
     'notice.apps.NoticeConfig',
+    'users.apps.UsersConfig'
 ]
 
 MIDDLEWARE = [
@@ -140,3 +141,9 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 STATIC_ROOT = os.path.join(BASE_DIR, '.static')
+
+
+LOGIN_URL = '/users/login/'          # 로그인 URL
+LOGIN_REDIRECT_URL = '/'  # 로그인 후 URL
+LOGOUT_REDIRECT_URL = '/'            # 로그아웃 후 URL
+AUTH_USER_MODEL = "users.User"       # 커스텀 인증 모델
