@@ -1,5 +1,55 @@
 from django.views.generic import ListView
 from .models import Notice
+from users.decorators import login_message_required
+from django.shortcuts import get_object_or_404, render, redirect
+from users.models import User
+from .forms import NoticeWriteForm
+from users.decorators import admin_required
+
+
+@login_message_required
+@admin_required
+def notice_write_view(request):
+    if request.method == "POST":
+        form = NoticeWriteForm(request.POST)
+        user = request.session['user_id']
+        user_id = User.objects.get(user_id = user)
+
+        if form.is_valid():
+            notice = form.save(commit = False)
+            notice.writer = user_id
+            notice.save()
+            return redirect('notice:notice_list')
+    else:
+        form = NoticeWriteForm()
+
+    return render(request, "notice/notice_write.html", {'form': form})
+
+@login_message_required
+def notice_detail_view(request, pk):
+    notice = get_object_or_404(Notice, pk=pk)
+    session_cookie = request.session['user_id']
+    cookie_name = F'notice_hits:{session_cookie}'
+    context = {
+        'notice': notice,
+    }
+    response = render(request, 'notice/notice_detail.html', context)
+
+    if request.COOKIES.get(cookie_name) is not None:
+        cookies = request.COOKIES.get(cookie_name)
+        cookies_list = cookies.split('|')
+        if str(pk) not in cookies_list:
+            response.set_cookie(cookie_name, cookies + f'|{pk}', expires=None)
+            notice.hits += 1
+            notice.save()
+            return response
+    else:
+        response.set_cookie(cookie_name, pk, expires=None)
+        notice.hits += 1
+        notice.save()
+        return response
+
+    return render(request, 'notice/notice_detail.html', context)
 
 class NoticeListView(ListView):
     model = Notice
