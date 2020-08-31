@@ -7,15 +7,15 @@ class LoginForm(forms.Form):
     user_id = forms.CharField(
         widget=forms.TextInput(
         attrs={'class': 'form-control',}),
-        error_messages={'required': '아이디을 입력해주세요.'},
+        error_messages={'required': 'Please enter your ID.'},
         max_length=32,
         label='ID'
     )
     password = forms.CharField(
         widget=forms.PasswordInput(
         attrs={'class': 'form-control',}),
-        error_messages={'required': '비밀번호를 입력해주세요.'},
-        label='비밀번호'
+        error_messages={'required': 'Please enter a password.'},
+        label='Password'
     )
 
     def clean(self):
@@ -27,19 +27,19 @@ class LoginForm(forms.Form):
             try:
                user = User.objects.get(user_id=user_id)
             except User.DoesNotExist:
-                self.add_error('user_id', '아이디가 존재하지 않습니다.')
+                self.add_error('user_id', 'ID does not exist.')
                 return
 
             if not check_password(password, user.password):
-                self.add_error('password', '비밀번호가 틀렸습니다.')
+                self.add_error('password', 'The password is incorrect.')
 
 def hp_validator(value):
     if len(str(value)) != 10:
-        raise forms.ValidationError('정확한 핸드폰 번호를 입력해주세요.')
+        raise forms.ValidationError('Please enter the correct mobile phone number.')
 
 def student_id_validator(value):
     if len(str(value)) != 7:
-        raise forms.ValidationError('본인의 학번 7자리를 입력해주세요.')
+        raise forms.ValidationError('Please enter your 7 digit student number.')
 
 class CsRegisterForm(UserCreationForm):
     def __init__(self, *args, **kwargs):

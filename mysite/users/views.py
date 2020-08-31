@@ -37,7 +37,7 @@ def main_view(request):
     """ notice_list = Notice.objects.order_by('-id')[:5]
     calendar_property = [x.event_id for x in Calender.objects.all() if x.d_day == False]
     calendar_list = Calender.objects.exclude(event_id__in=calendar_property).order_by('start_date')[:5]
-    free_list = Free.objects.filter(category='정보').order_by('-id')[:5]
+    free_list = Free.objects.filter(category='Information').order_by('-id')[:5]
     anonymous_list = sorted(Anonymous.objects.all(), key=lambda t: t.like_count, reverse=True)[:5]
 
     context = {
@@ -63,7 +63,7 @@ class AgreementView(View):
             else:
                 return redirect('/users/register/')
         else:
-            messages.info(request, "약관에 모두 동의해주세요.")
+            messages.info(request, "Please agree to all terms and conditions.")
             return render(request, 'users/agreement.html')
 
 class CsRegisterView(CreateView):
@@ -79,14 +79,14 @@ class CsRegisterView(CreateView):
 
     def get_success_url(self):
         self.request.session['register_auth'] = True
-        messages.success(self.request, '회원님의 입력한 Email 주소로 인증 메일이 발송되었습니다. 인증 후 로그인이 가능합니다.')
+        messages.success(self.request, 'A verification email has been sent to the email address you entered. After authentication, you can log in.')
         return reverse('users:register_success')
 
     def form_valid(self, form):
         self.object = form.save()
 
         send_mail(
-            '{}님의 회원가입 인증메일 입니다.'.format(self.object.user_id),
+            'This is the member registration verification email of {}'.format(self.object.user_id),
             [self.object.email],
             html=render_to_string('users/register_email.html', {
                 'user': self.object,
@@ -102,17 +102,17 @@ def activate(request, uid64, token):
         uid = force_text(urlsafe_base64_decode(uid64))
         current_user = User.objects.get(pk=uid)
     except (TypeError, ValueError, OverflowError, User.DoesNotExist, ValidationError):
-        messages.error(request, '메일 인증에 실패했습니다.')
+        messages.error(request, 'Mail authentication failed.')
         return redirect('users:login')
 
     if default_token_generator.check_token(current_user, token):
         current_user.is_active = True
         current_user.save()
 
-        messages.info(request, '메일 인증이 완료 되었습니다. 회원가입을 축하드립니다!')
+        messages.info(request, 'Mail authentication is complete. Congratulations on signing up!')
         return redirect('users:login')
 
-    messages.error(request, '메일 인증에 실패했습니다.')
+    messages.error(request, 'Mail authentication failed.')
     return redirect('users:login')
 
 def register_success(request):
