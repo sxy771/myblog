@@ -9,7 +9,7 @@ class LoginForm(forms.Form):
         attrs={'class': 'form-control',}),
         error_messages={'required': '아이디을 입력해주세요.'},
         max_length=32,
-        label='아이디'
+        label='ID'
     )
     password = forms.CharField(
         widget=forms.PasswordInput(
@@ -45,50 +45,50 @@ class CsRegisterForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super(CsRegisterForm, self).__init__(*args, **kwargs)
 
-        self.fields['user_id'].label = '아이디'
+        self.fields['user_id'].label = 'ID'
         self.fields['user_id'].widget.attrs.update({
             # 'class': 'form-control col-sm-10',
             'class': 'form-control',
-            # 'placeholder': '아이디를 입력해주세요.',
+            # 'placeholder': 'Please enter your ID.',
             'autofocus': False
         })
-        self.fields['password1'].label = '비밀번호'
+        self.fields['password1'].label = 'Password'
         self.fields['password1'].widget.attrs.update({
             'class': 'form-control',
-            # 'placeholder': '비밀번호를 입력해주세요.',
+            # 'placeholder': 'Please enter a password.',
         })
-        self.fields['password2'].label = '비밀번호 확인'
+        self.fields['password2'].label = 'Password Confirm'
         self.fields['password2'].widget.attrs.update({
             'class': 'form-control',
-            # 'placeholder': '비밀번호를 다시 입력해주세요.',
+            # 'placeholder': 'Please enter your password again.',
         })
-        self.fields['email'].label = '이메일'
+        self.fields['email'].label = 'email'
         self.fields['email'].widget.attrs.update({
             'class': 'form-control',
-            # 'placeholder': '회원가입 후 입력하신 메일로 본인인증 메일이 전송됩니다.',
+            # 'placeholder': 'After signing up, a user verification email will be sent to the email you entered.',
         })
-        self.fields['name'].label = '이름'
+        self.fields['name'].label = 'Name'
         self.fields['name'].widget.attrs.update({
             'class': 'form-control',
-            # 'placeholder': "아이디, 비밀번호 찾기에 이용됩니다.",
+            # 'placeholder': "It is used to find ID and password.",
         })
-        self.fields['hp'].label = '핸드폰번호'
+        self.fields['hp'].label = 'Phone Number'
         self.fields['hp'].validators = [hp_validator]
         self.fields['hp'].widget.attrs.update({
             'class': 'form-control',
-            # 'placeholder': "'-'를 제외한 숫자로 입력해주세요",
+            # 'placeholder': "Please enter a number excluding'-'",
         })
-        self.fields['grade'].label = '학년'
+        self.fields['grade'].label = 'Grade'
         self.fields['grade'].widget.attrs.update({
             'class': 'form-control',
         })
-        self.fields['student_id'].label = '학번'
+        self.fields['student_id'].label = 'Student Number'
         self.fields['student_id'].validators = [student_id_validator]
         self.fields['student_id'].widget.attrs.update({
             'class': 'form-control',
-            # 'placeholder': "학번을 입력해주세요.",
+            # 'placeholder': "Please enter your student number.",
         })
-        self.fields['circles'].label = '학술동아리'
+        self.fields['circles'].label = 'Society'
         self.fields['circles'].widget.attrs.update({
             'class': 'form-control'
         })
@@ -100,7 +100,7 @@ class CsRegisterForm(UserCreationForm):
     def save(self, commit=True):
         user = super(CsRegisterForm, self).save(commit=False)
         user.level = '2'
-        user.department = '컴퓨터공학부'
+        user.department = 'Computer Sicence'
         user.is_active = False
         user.save()
 
