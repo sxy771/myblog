@@ -6,3 +6,10 @@ db.sqlite3
 /static
 .DS_Store
 secrets.json
+.profile
+.bash_history
+.my.cnf
+.virtualenvs/
+.local/
+.git/
+.cache/
