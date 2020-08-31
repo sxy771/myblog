@@ -55,6 +55,8 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'notice.apps.NoticeConfig',
     'django.contrib.humanize',
+    'free.apps.FreeConfig',
+    'resume.apps.ResumeConfig',
 ]
 
 MIDDLEWARE = [

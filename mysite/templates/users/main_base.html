@@ -67,45 +67,45 @@
             <div class="p-4 pt-5" style="position: fixed; width:300px;">
                 {% if user.is_authenticated %}
                 {% if user.level == '0' %}
-                <span style="font-size: 22px;">{{ user.name }}</span> 님 환영합니다. (개발자)
+                Welcome, <span style="font-size: 22px;">{{ user.name }}</span>! (Development)
                 <div style="text-align: right; margin-bottom: -25px;">
-                    <a href="{% url 'users:logout' %}">로그아웃</a>
+                    <a href="{% url 'users:logout' %}">Logout</a>
                 </div>
                 {% elif user.level == '1' %}
-                <span style="font-size: 22px;">{{ user.name }}</span> 님 환영합니다. (관리자)
+                Welcome, <span style="font-size: 22px;">{{ user.name }}</span>! (admin)
                 <div style="text-align: right; margin-bottom: -25px;">
-                    <a href="{% url 'users:logout' %}">로그아웃</a>
+                    <a href="{% url 'users:logout' %}">Logout</a>
                 </div>
                 {% else %}
-                <span style="font-size: 22px;">{{ user.name }}</span> 님 환영합니다.
-                <a href="{% url 'users:logout' %}" style="margin-left:33px;">로그아웃</a>
+                Welcome, <span style="font-size: 22px;">{{ user.name }}</span>!
+                <a href="{% url 'users:logout' %}" style="margin-left:33px;">Logout</a>
                 <br>
                 {% endif %}
                 {% else %}
-                <p>이 유저는 로그아웃 되어 있습니다..</p>
+                <p>This user is logged in...</p>
 
-                <a href="{% url 'users:login' %}">로그인</a>&nbsp;&middot;
-                <a href="{% url 'users:agreement' %}">회원가입</a>
+                <a href="{% url 'users:login' %}">Login</a>&nbsp;&middot;
+                <a href="{% url 'users:agreement' %}">Register</a>
                 <br>
                 {% endif %}
                 <br>
                 <ul class="list-unstyled components mb-5 allMenuComponents" id="allMenuHide">
                     <!-- <li class="active"> -->
                     <li>
-                        <a href="{% url 'users:main' %}"><i class="fas fa-home" style="margin-left:1px;"></i>&nbsp;&nbsp;메인으로</a>
+                        <a href="{% url 'users:main' %}"><i class="fas fa-home" style="margin-left:1px;"></i>&nbsp;&nbsp;GoToMain</a>
                     </li>
                     <li>
                         <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle menu1"><i
-                                class="fas fa-user" style="margin:0 2.5px;"></i>&nbsp;&nbsp;마이페이지</a>
+                                class="fas fa-user" style="margin:0 2.5px;"></i>&nbsp;&nbsp;My Page</a>
                         <ul class="collapse list-unstyled" id="homeSubmenu">
                             <li>
-                                <a href="#"><i class="fas fa-user-cog"></i>&nbsp;&nbsp;내 정보</a>
+                                <a href="#"><i class="fas fa-user-cog"></i>&nbsp;&nbsp;My Profile</a>
                             </li>
                             <li>
-                                <a href="#"><i class="fas fa-user-edit"></i>&nbsp;&nbsp;작성한 글</a>
+                                <a href="#"><i class="fas fa-user-edit"></i>&nbsp;&nbsp;Post by you</a>
                             </li>
                             <li>
-                                <a href="#"><i class="fas fa-comments"></i>&nbsp;&nbsp;댓글단 글</a>
+                                <a href="#"><i class="fas fa-comments"></i>&nbsp;&nbsp;Comments by you</a>
                             </li>
                         </ul>
                     </li>
@@ -114,31 +114,31 @@
                     </li> -->
                     <li>
                         <a href="#pageSubmenu1" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle menu2"><i
-                                class="fas fa-pen" style="margin-right:4px;"></i>&nbsp;&nbsp;커뮤니티</a>
+                                class="fas fa-pen" style="margin-right:4px;"></i>&nbsp;&nbsp;Community</a>
                         <ul class="collapse list-unstyled" id="pageSubmenu1">
                             <li>
-                                <a href="#"><i
-                                        class="fas fa-clipboard-check"></i>&nbsp;&nbsp;공지사항</a>
+                                <a href="{% url 'notice:notice_list' %}"><i
+                                        class="fas fa-clipboard-check"></i>&nbsp;&nbsp;CS info</a>
                             </li>
                             <li>
                                 <a href="#"><i
-                                        class="fas fa-clipboard-list"></i>&nbsp;&nbsp;자유게시판</a>
+                                        class="fas fa-clipboard-list"></i>&nbsp;&nbsp;Homepage info</a>
                             </li>
                             <li>
                                 <a href="#"><i
-                                        class="fas fa-clipboard"></i>&nbsp;&nbsp;익명게시판</a>
+                                        class="fas fa-clipboard"></i>&nbsp;&nbsp;Anonymous Forum</a>
                             </li>
                         </ul>
                     </li>
                     <li>
                         <a href="#pageSubmenu2" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle menu3"><i
-                                class="fas fa-graduation-cap"></i>&nbsp;&nbsp;학사정보</a>
+                                class="fas fa-graduation-cap"></i>&nbsp;&nbsp;NA</a>
                         <ul class="collapse list-unstyled" id="pageSubmenu2">
                             <li>
-                                <a href="#"><i class="fas fa-calendar-check"></i>&nbsp;&nbsp;학사일정</a>
+                                <a href="#"><i class="fas fa-calendar-check"></i>&nbsp;&nbsp;NA</a>
                             </li>
                             <li>
-                                <a href="#"><i class="fas fa-table"></i>&nbsp;&nbsp;시험시간표</a>
+                                <a href="#"><i class="fas fa-table"></i>&nbsp;&nbsp;Test schedule</a>
                             </li>
                             <!-- <li>
                                 <a href="#">Page 3</a>
@@ -147,21 +147,21 @@
                     </li>
                     <li>
                         <a href="#pageSubmenu3" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle menu4"><i
-                                class="fas fa-users"></i>&nbsp;&nbsp;학생활동</a>
+                                class="fas fa-users"></i>&nbsp;&nbsp;NA</a>
                         <ul class="collapse list-unstyled" id="pageSubmenu3">
                             <li>
-                                <a href="#"><i class="fas fa-sitemap"></i>&nbsp;&nbsp;학생회조직도</a>
+                                <a href="#"><i class="fas fa-sitemap"></i>&nbsp;&nbsp;NA</a>
                             </li>
                             <li>
-                                <a href="#"><i class="fas fa-diagnoses"></i>&nbsp;&nbsp;동아리소개</a>
+                                <a href="#"><i class="fas fa-diagnoses"></i>&nbsp;&nbsp;NA</a>
                             </li>
                             <li>
-                                <a href="#">&nbsp;<i class="fas fa-flask"></i>&nbsp;&nbsp;연구실소개</a>
+                                <a href="#">&nbsp;<i class="fas fa-flask"></i>&nbsp;&nbsp;NA</a>
                             </li>
                         </ul>
                     </li>
                     <li>
-                        <a href="https://pf.kakao.com/_xgJeuxb" target="_blank"><i class="fas fa-robot"></i>&nbsp;&nbsp;챗봇연결</a>
+                        <a href="#" target="_blank"><i class="fas fa-robot"></i>&nbsp;&nbsp;Chatbot</a>
                     </li>
                 </ul>
 

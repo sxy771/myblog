@@ -1,56 +1,29 @@
-from django.views.generic import ListView
+from django.shortcuts import render, get_object_or_404, redirect
+from django.utils.decorators import method_decorator
+from django.views.generic import View, ListView, DetailView, FormView, CreateView
 from .models import Notice
-from users.decorators import login_message_required
-from django.shortcuts import get_object_or_404, render, redirect
-from users.models import User
+from users.decorators import login_message_required, admin_required
+from django.db.models import Q
+from django.contrib import messages
+from django.urls import reverse
 from .forms import NoticeWriteForm
-from users.decorators import admin_required
+from users.models import User
+import mimetypes
+from mimetypes import guess_type
+import os
+import re
+from django.http import HttpResponse, HttpResponseRedirect, Http404
+from urllib.parse import quote
+import urllib
+from django.conf import settings
+
+# 공지사항 게시판 권한
+# level 2,3 = READ
+# level 1 관리자 = CREATE, READ + 본인 글 UPDATE, DELETE
+# level 0 개발자 = CREATE, READ, UPDATE, DELETE
 
 
-@login_message_required
-@admin_required
-def notice_write_view(request):
-    if request.method == "POST":
-        form = NoticeWriteForm(request.POST)
-        user = request.session['user_id']
-        user_id = User.objects.get(user_id = user)
-
-        if form.is_valid():
-            notice = form.save(commit = False)
-            notice.writer = user_id
-            notice.save()
-            return redirect('notice:notice_list')
-    else:
-        form = NoticeWriteForm()
-
-    return render(request, "notice/notice_write.html", {'form': form})
-
-@login_message_required
-def notice_detail_view(request, pk):
-    notice = get_object_or_404(Notice, pk=pk)
-    session_cookie = request.session['user_id']
-    cookie_name = F'notice_hits:{session_cookie}'
-    context = {
-        'notice': notice,
-    }
-    response = render(request, 'notice/notice_detail.html', context)
-
-    if request.COOKIES.get(cookie_name) is not None:
-        cookies = request.COOKIES.get(cookie_name)
-        cookies_list = cookies.split('|')
-        if str(pk) not in cookies_list:
-            response.set_cookie(cookie_name, cookies + f'|{pk}', expires=None)
-            notice.hits += 1
-            notice.save()
-            return response
-    else:
-        response.set_cookie(cookie_name, pk, expires=None)
-        notice.hits += 1
-        notice.save()
-        return response
-
-    return render(request, 'notice/notice_detail.html', context)
-
+# 공지사항 리스트 뷰
 class NoticeListView(ListView):
     model = Notice
     paginate_by = 15
@@ -109,3 +82,144 @@ class NoticeListView(ListView):
         context['notice_fixed'] = notice_fixed
 
         return context
+
+
+# 공지사항 게시글 보기
+@login_message_required
+def notice_detail_view(request, pk):
+    notice = get_object_or_404(Notice, pk=pk)
+    # notice = Notice.objects.filter(id=pk)
+    session_cookie = request.session['user_id']
+    cookie_name = F'notice_hits:{session_cookie}'
+
+    if request.user == notice.writer:
+        notice_auth = True
+    else:
+        notice_auth = False
+
+    context = {
+        'notice': notice,
+        'notice_auth': notice_auth,
+    }
+    response = render(request, 'notice/notice_detail.html', context)
+
+    # 조회수 GET증가 방지 쿠키처리
+    if request.COOKIES.get(cookie_name) is not None:
+        cookies = request.COOKIES.get(cookie_name)
+        cookies_list = cookies.split('|')
+        if str(pk) not in cookies_list:
+            response.set_cookie(cookie_name, cookies + f'|{pk}', expires=None)
+            # notice.update(hits=F('hits') + 1)
+            notice.hits += 1
+            notice.save()
+            return response
+    else:
+        response.set_cookie(cookie_name, pk, expires=None)
+        # notice.update(hits=F('hits') + 1)
+        notice.hits += 1
+        notice.save()
+        return response
+    return render(request, 'notice/notice_detail.html', context)
+
+
+# 공지사항 글쓰기
+@login_message_required
+@admin_required
+def notice_write_view(request):
+    if request.method == "POST":
+        form = NoticeWriteForm(request.POST, request.FILES)
+        user = request.session['user_id']
+        user_id = User.objects.get(user_id = user)
+        # upload_files = request.FILES.getlist('files')
+
+        if form.is_valid():
+            notice = form.save(commit = False)
+            notice.writer = user_id
+            # 첨부파일명 save
+            if request.FILES:
+                if 'upload_files' in request.FILES.keys():
+                    notice.filename = request.FILES['upload_files'].name
+                # extension = notice.filename.split(".")[1].lower()
+                # notice.extension = '.' + extension
+            notice.save()
+            return redirect('notice:notice_list')
+    else:
+        form = NoticeWriteForm()
+    return render(request, "notice/notice_write.html", {'form': form})
+
+
+# 공지사항 게시글 수정
+@login_message_required
+def notice_edit_view(request, pk):
+    notice = Notice.objects.get(id=pk)
+
+    if request.method == "POST":
+        if(notice.writer == request.user or request.user.level == '0'):
+
+            file_change_check = request.POST.get('fileChange', False)
+            file_check = request.POST.get('upload_files-clear', False)
+
+            if file_check or file_change_check:
+                os.remove(os.path.join(settings.MEDIA_ROOT, notice.upload_files.path))
+
+            form = NoticeWriteForm(request.POST, request.FILES, instance=notice)
+            if form.is_valid():
+                # test-------------------------------#
+                notice = form.save(commit = False)
+                if request.FILES:
+                    if 'upload_files' in request.FILES.keys():
+                        notice.filename = request.FILES['upload_files'].name
+                notice.save()
+                #------------------------------------#
+                # form.save()
+                messages.success(request, "수정되었습니다.")
+                return redirect('/notice/'+str(pk))
+    else:
+        notice = Notice.objects.get(id=pk)
+        if notice.writer == request.user or request.user.level == '0':
+            form = NoticeWriteForm(instance=notice)
+            # test---------------------------------------------------------#
+            context = {
+                'form': form,
+                'edit': '수정하기',
+            }
+            if notice.filename and notice.upload_files:
+                context['filename'] = notice.filename
+                context['file_url'] = notice.upload_files.url
+            #--------------------------------------------------------------#
+            # return render(request, "notice/notice_write.html", {'form': form, 'edit': '수정하기'})
+            return render(request, "notice/notice_write.html", context)
+        else:
+            messages.error(request, "본인 게시글이 아닙니다.")
+            return redirect('/notice/'+str(pk))
+
+
+# 공지사항 게시글 삭제
+@login_message_required
+def notice_delete_view(request, pk):
+    notice = Notice.objects.get(id=pk)
+    if notice.writer == request.user or request.user.level == '0':
+        notice.delete()
+        messages.success(request, "삭제되었습니다.")
+        return redirect('/notice/')
+    else:
+        messages.error(request, "본인 게시글이 아닙니다.")
+        return redirect('/notice/'+str(pk))
+
+
+# 공지사항 게시글 첨부파일 다운로드 한글명 인코딩
+@login_message_required
+def notice_download_view(request, pk):
+    notice = get_object_or_404(Notice, pk=pk)
+    url = notice.upload_files.url[1:]
+    #file_url = urllib.parse.unquote(url)
+
+    if os.path.exists(url):
+        with open(url, 'rb') as fh:
+            #quote_file_url = urllib.parse.quote(file_url.encode('utf-8'))
+            quote_file_url = urllib.parse.quote(notice.filename.encode('utf-8'))
+            response = HttpResponse(fh.read(), content_type=mimetypes.guess_type(url)[0])
+            #response['Content-Disposition'] = 'attachment;filename*=UTF-8\'\'%s' % quote_file_url[29:]
+            response['Content-Disposition'] = 'attachment;filename*=UTF-8\'\'%s' % quote_file_url
+            return response
+        raise Http404
