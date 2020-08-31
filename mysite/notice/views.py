@@ -17,10 +17,7 @@ from urllib.parse import quote
 import urllib
 from django.conf import settings
 
-# 공지사항 게시판 권한
-# level 2,3 = READ
-# level 1 관리자 = CREATE, READ + 본인 글 UPDATE, DELETE
-# level 0 개발자 = CREATE, READ, UPDATE, DELETE
+
 
 
 # 공지사항 리스트 뷰
@@ -219,7 +216,7 @@ def notice_download_view(request, pk):
             #quote_file_url = urllib.parse.quote(file_url.encode('utf-8'))
             quote_file_url = urllib.parse.quote(notice.filename.encode('utf-8'))
             response = HttpResponse(fh.read(), content_type=mimetypes.guess_type(url)[0])
-            #response['Content-Disposition'] = 'attachment;filename*=UTF-8\'\'%s' % quote_file_url[29:]
-            response['Content-Disposition'] = 'attachment;filename*=UTF-8\'\'%s' % quote_file_url
+            response['Content-Disposition'] = 'attachment;filename*=UTF-8\'\'%s' % quote_file_url[29:]
+            #response['Content-Disposition'] = 'attachment;filename*=UTF-8\'\'%s' % quote_file_url
             return response
         raise Http404
